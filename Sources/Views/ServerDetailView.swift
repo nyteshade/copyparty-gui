@@ -79,7 +79,7 @@ struct ServerDetailView: View {
                 .keyboardShortcut(".", modifiers: .command)
             } else {
                 Button {
-                    store.start(serverID)
+                    store.requestStart(serverID)
                     tab = .log
                 } label: {
                     Label("Start", systemImage: "play.fill")

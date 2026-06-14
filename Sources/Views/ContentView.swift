@@ -19,5 +19,18 @@ struct ContentView: View {
                 )
             }
         }
+        .alert(
+            "Port already in use",
+            isPresented: Binding(
+                get: { store.pendingConflict != nil },
+                set: { if !$0 { store.cancelPendingStart() } }
+            ),
+            presenting: store.pendingConflict
+        ) { _ in
+            Button("Fix & Start") { store.confirmStartWithFix() }
+            Button("Cancel", role: .cancel) { store.cancelPendingStart() }
+        } message: { pc in
+            Text("\(pc.serverName) can't use these ports right now:\n\n\(PortResolver.summary(pc.conflicts))\n\nCopyParty can switch to the free ports shown and start.")
+        }
     }
 }

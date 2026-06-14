@@ -74,7 +74,7 @@ private struct SidebarRow: View {
                 .buttonStyle(.borderless)
                 .help("Stop")
             } else {
-                Button { store.start(serverID) } label: {
+                Button { store.requestStart(serverID) } label: {
                     Image(systemName: "play.fill")
                 }
                 .buttonStyle(.borderless)

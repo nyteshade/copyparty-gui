@@ -109,6 +109,7 @@ final class ServerController: ObservableObject {
             self.process = proc
             self.stdoutPipe = pipe
             state = .running(pid: proc.processIdentifier)
+            ProcessReaper.register(proc.processIdentifier)
             appendLine("# started (pid \(proc.processIdentifier))")
         } catch {
             appendLine("error: failed to launch — \(error.localizedDescription)")
@@ -128,6 +129,11 @@ final class ServerController: ObservableObject {
         DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
             if proc.isRunning { kill(pid, SIGKILL) }
         }
+    }
+
+    /// Append an informational line to the log (e.g. an auto port-adjust note).
+    func logNote(_ line: String) {
+        appendLine(line)
     }
 
     func restart(server: ServerInstance) {
@@ -157,6 +163,7 @@ final class ServerController: ObservableObject {
     // MARK: - Internals
 
     private func handleTermination(_ proc: Process) {
+        ProcessReaper.unregister(proc.processIdentifier)
         stdoutPipe?.fileHandleForReading.readabilityHandler = nil
         let code = proc.terminationStatus
         if proc.terminationReason == .uncaughtSignal {

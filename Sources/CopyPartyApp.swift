@@ -1,10 +1,25 @@
 import SwiftUI
 import AppKit
 
-/// App delegate used only to override the Dock icon at launch (see DockIcon).
+/// App delegate: overrides the Dock icon at launch (see DockIcon) and makes sure
+/// bundled copyparty child processes never outlive the app (see ProcessReaper).
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         DockIcon.applyUnmaskedIcon()
+        // Orphan reaping happens in ServerStore.init (before autostart) so it
+        // can't kill a child we're about to launch. Here we only arm the
+        // shutdown handlers.
+        ProcessReaper.installTerminationHandlers()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        ProcessReaper.terminateAll()
+    }
+
+    // Quitting should not be blocked by running servers; tear them down.
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        ProcessReaper.terminateAll()
+        return .terminateNow
     }
 }
 

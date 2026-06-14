@@ -4,6 +4,26 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] — 2026-06-14
+
+### Added
+
+- **Port-conflict resolution.** Starting a server now checks every port first; if
+  one is busy, an alert offers to switch to the next free port(s) and start
+  (**Fix & Start**) instead of just failing. Auto-start servers resolve conflicts
+  automatically at launch and note the change in the log.
+
+### Fixed
+
+- **Child copyparty processes no longer orphan when the app quits.** SwiftUI's
+  cleanup hooks don't run on SIGTERM (e.g. `pkill`), so a running server could
+  survive the app and keep its port bound. A new `ProcessReaper` tracks every
+  child PID, terminates them on quit / SIGTERM / SIGINT, and reaps leftovers from
+  a previous hard-killed run on the next launch. It only ever signals processes
+  whose command line is unmistakably our own copyparty (matches both
+  `copyparty-sfx.py` and a `CopyParty.app` bundle path), so it can never kill an
+  unrelated process — even on PID reuse.
+
 ## [1.3.0] — 2026-06-14
 
 ### Fixed
@@ -99,6 +119,7 @@ self-contained, batteries-included Python runtime.
   [barkerbaggies](https://www.deviantart.com/barkerbaggies), licensed under
   [CC BY-NC-SA 3.0 Unported](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
+[1.4.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.4.0
 [1.3.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.3.0
 [1.2.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.2.0
 [1.1.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.1.0

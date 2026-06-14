@@ -6,7 +6,7 @@ import Darwin
 /// listener up front and surface a clear message instead of a crash.
 enum PortChecker {
 
-    enum Status {
+    enum Status: Equatable {
         case available
         case inUse           // EADDRINUSE — something is already listening
         case needsPrivilege  // EACCES — privileged port (<1024) without root
@@ -43,4 +43,22 @@ enum PortChecker {
         default:         return .unknown
         }
     }
+
+    /// Find the first bindable port at or after `start` (kept ≥ 1024 to avoid
+    /// privileged ports), skipping any in `excluding` so multiple remaps don't
+    /// collide with each other.
+    static func firstAvailable(from start: Int,
+                               host: String = "0.0.0.0",
+                               udp: Bool = false,
+                               excluding: Set<Int> = []) -> Int {
+        var port = max(1024, start)
+        while port <= 65535 {
+            if !excluding.contains(port), check(port: port, udp: udp, host: host) == .available {
+                return port
+            }
+            port += 1
+        }
+        return start
+    }
 }
+
