@@ -4,6 +4,25 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-06-14
+
+### Added
+
+- **Visible update indicator** — an always-on engine status pill in the sidebar
+  shows the installed copyparty version and update state at a glance (idle /
+  checking / up-to-date / update available / downloading / installed / error),
+  with a details popover (installed vs. latest version, last-checked time, and
+  Check Now / Update / release-notes actions). The app performs one quiet update
+  check on launch.
+- **Licensing** — `LICENSE` (MIT, for the source code) and `NOTICE` (clarifying
+  that the CC BY-NC-SA app icon and bundled third-party components keep their own
+  terms).
+
+### Fixed
+
+- The copyparty version probe now runs off the main thread, so refreshing the
+  version no longer briefly blocks the UI.
+
 ## [1.1.0] — 2026-06-14
 
 ### Added
@@ -64,5 +83,6 @@ self-contained, batteries-included Python runtime.
   [barkerbaggies](https://www.deviantart.com/barkerbaggies), licensed under
   [CC BY-NC-SA 3.0 Unported](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
+[1.2.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.2.0
 [1.1.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.0.0

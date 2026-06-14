@@ -20,20 +20,30 @@ struct ServerSidebar: View {
         }
         .listStyle(.sidebar)
         .safeAreaInset(edge: .bottom) {
-            HStack {
-                Button { store.addServer() } label: {
-                    Label("Add Server", systemImage: "plus")
+            VStack(spacing: 0) {
+                Divider()
+                HStack {
+                    EngineStatusView()
+                    Spacer()
                 }
-                .buttonStyle(.borderless)
-                Spacer()
-                if let id = store.selection {
-                    Button(role: .destructive) { store.delete(id) } label: {
-                        Image(systemName: "trash")
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                Divider()
+                HStack {
+                    Button { store.addServer() } label: {
+                        Label("Add Server", systemImage: "plus")
                     }
                     .buttonStyle(.borderless)
+                    Spacer()
+                    if let id = store.selection {
+                        Button(role: .destructive) { store.delete(id) } label: {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.borderless)
+                    }
                 }
+                .padding(8)
             }
-            .padding(8)
             .background(.bar)
         }
     }

@@ -63,7 +63,7 @@ struct AdvancedTab: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear { updates.refreshCurrentVersion() }
+        .task { if !updates.didInitialRefresh { await updates.refreshCurrentVersion() } }
     }
 
     @ViewBuilder

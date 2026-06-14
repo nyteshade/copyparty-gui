@@ -20,7 +20,7 @@ struct CopyPartyApp: App {
                 .environmentObject(store)
                 .environmentObject(updates)
                 .frame(minWidth: 880, minHeight: 560)
-                .onAppear { updates.refreshCurrentVersion() }
+                .task { await updates.checkForUpdates() }
                 .onDisappear { store.stopAll() }
         }
         .windowStyle(.titleBar)

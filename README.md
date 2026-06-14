@@ -203,6 +203,9 @@ This project follows [Semantic Versioning](https://semver.org/) and keeps a
 
 ## Credits & licensing
 
+- **Source code:** [MIT](LICENSE).
+- **App icon & bundled components:** not covered by MIT — see [NOTICE](NOTICE).
+  In particular the icon is **NonCommercial** (CC BY-NC-SA 3.0).
 - Directed and co-authored using **Anthropic's Claude Opus 4.8**.
 - App icon: the **"A-Side" cassette tape** icon by
   [barkerbaggies](https://www.deviantart.com/barkerbaggies)

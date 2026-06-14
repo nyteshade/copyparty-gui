@@ -19,6 +19,8 @@ final class UpdateService: ObservableObject {
     @Published var status: Status = .idle
     @Published var currentVersion: String = "—"
     @Published var latestVersion: String?
+    @Published var lastChecked: Date?
+    @Published private(set) var didInitialRefresh = false
 
     private let releasesAPI = URL(string: "https://api.github.com/repos/9001/copyparty/releases/latest")!
     private let sfxDownloadURL = URL(string: "https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py")!
@@ -26,9 +28,12 @@ final class UpdateService: ObservableObject {
 
     var releaseNotesURL: URL { changelogURL }
 
-    func refreshCurrentVersion() {
-        let v = PythonRuntime.activeVersion() ?? "unknown"
-        currentVersion = v
+    /// Probe the bundled/active sfx for its version off the main thread (the
+    /// probe spawns a process and must not block the UI).
+    func refreshCurrentVersion() async {
+        let v = await Task.detached { PythonRuntime.activeVersion() }.value
+        currentVersion = v ?? "unknown"
+        didInitialRefresh = true
     }
 
     struct GHRelease: Decodable {
@@ -38,7 +43,8 @@ final class UpdateService: ObservableObject {
 
     func checkForUpdates() async {
         status = .checking
-        refreshCurrentVersion()
+        await refreshCurrentVersion()
+        defer { lastChecked = Date() }
         do {
             var req = URLRequest(url: releasesAPI)
             req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
@@ -74,7 +80,7 @@ final class UpdateService: ObservableObject {
             try? FileManager.default.removeItem(at: dest)
             try FileManager.default.moveItem(at: tempURL, to: dest)
 
-            refreshCurrentVersion()
+            await refreshCurrentVersion()
             status = .installed(version: currentVersion)
         } catch {
             status = .error(error.localizedDescription)

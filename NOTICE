@@ -1,0 +1,42 @@
+CopyParty.app — third-party notices
+====================================
+
+The CopyParty.app SOURCE CODE is licensed under the MIT License (see LICENSE).
+The following components are NOT covered by that MIT license and retain their
+own terms:
+
+App icon
+--------
+The "A-Side" cassette-tape icon (Resources/Icon/A-Side.icns and the derived
+AppIcon image set) is by barkerbaggies and is licensed under
+Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
+(CC BY-NC-SA 3.0).
+
+  Author:  barkerbaggies — https://www.deviantart.com/barkerbaggies
+  Source:  https://www.softicons.com/object-icons/cassette-tape-icons-by-barkerbaggies/a-side-icon
+  License: https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+IMPORTANT: CC BY-NC-SA 3.0 is a NonCommercial license. The icon — and therefore
+any build of the app that ships this icon — may not be used commercially.
+Replace the icon to relicense a build for commercial use.
+
+Bundled at build time (not committed to this repository)
+--------------------------------------------------------
+These are downloaded by scripts/fetch-vendor.sh and embedded in the built .app:
+
+* copyparty (copyparty-sfx.py) — © the copyparty authors.
+  https://github.com/9001/copyparty  (MIT License)
+
+* CPython runtime via python-build-standalone — Python Software Foundation
+  License and the licenses of the included components.
+  https://github.com/astral-sh/python-build-standalone
+
+* Optional Python packages installed into the bundled interpreter, each under
+  its own license:
+    - paramiko      (LGPL-2.1)
+    - Pillow        (MIT-CMU / HPND)
+    - mutagen       (GPL-2.0-or-later)
+    - impacket      (Apache-2.0-ish / SecureAuth)
+    - argon2-cffi   (MIT)
+  Note: mutagen is GPL and paramiko is LGPL; redistributing a build that
+  bundles them carries those obligations.
