@@ -49,7 +49,9 @@ struct ProtocolSettings: Codable, Hashable {
     // SMB (experimental, read-only by default)
     var smbEnabled: Bool = false           // --smb
     var smbWritable: Bool = false          // --smbw
-    var smbPort: Int = 445                 // --smb-port
+    // Default to a non-privileged port: macOS already owns 445 (file sharing),
+    // and binding <1024 needs root. Connect with smb://host:3945.
+    var smbPort: Int = 3945                // --smb-port
 
     // Zeroconf / mDNS discovery
     var zeroconfEnabled: Bool = false      // -z
@@ -60,4 +62,16 @@ struct ProtocolSettings: Codable, Hashable {
 
     /// The primary HTTP port for "open in browser".
     var primaryHTTPPort: Int { httpPorts.first ?? 3923 }
+
+    /// Every port this configuration will try to bind, for pre-flight checks.
+    struct Listener { let label: String; let port: Int; let udp: Bool }
+    var plannedListeners: [Listener] {
+        var out: [Listener] = httpPorts.map { Listener(label: "HTTP", port: $0, udp: false) }
+        if ftpEnabled  { out.append(Listener(label: "FTP",  port: ftpPort,  udp: false)) }
+        if ftpsEnabled { out.append(Listener(label: "FTPS", port: ftpsPort, udp: false)) }
+        if sftpEnabled { out.append(Listener(label: "SFTP", port: sftpPort, udp: false)) }
+        if tftpEnabled { out.append(Listener(label: "TFTP", port: tftpPort, udp: true)) }
+        if smbEnabled  { out.append(Listener(label: "SMB",  port: smbPort,  udp: false)) }
+        return out
+    }
 }

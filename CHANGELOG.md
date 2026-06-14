@@ -4,6 +4,22 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] — 2026-06-14
+
+### Fixed
+
+- **A failing protocol no longer crashes the whole server.** copyparty aborts the
+  entire process if any single listener can't bind, so enabling e.g. SMB on a
+  taken port took everything down. The app now pre-flights every planned port
+  (HTTP/FTP/FTPS/SFTP/TFTP/SMB) before launching and refuses to start with a
+  clear message naming the conflicting port, instead of letting copyparty crash.
+
+### Changed
+
+- **SMB now defaults to port 3945** instead of 445. macOS already owns 445 (file
+  sharing) and binding it requires root; connect with `smb://host:3945`. The
+  pre-flight check also calls out privileged ports (<1024) that need root.
+
 ## [1.2.0] — 2026-06-14
 
 ### Added
@@ -83,6 +99,7 @@ self-contained, batteries-included Python runtime.
   [barkerbaggies](https://www.deviantart.com/barkerbaggies), licensed under
   [CC BY-NC-SA 3.0 Unported](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
+[1.3.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.3.0
 [1.2.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.2.0
 [1.1.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.0.0

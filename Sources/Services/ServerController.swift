@@ -57,6 +57,16 @@ final class ServerController: ObservableObject {
             return
         }
 
+        // Pre-flight: copyparty aborts entirely if any listener can't bind, so
+        // check every planned port first and refuse with a clear message.
+        if let problem = preflightPorts(server.protocols) {
+            appendLine("error: cannot start — port problem:")
+            appendLine(problem)
+            appendLine("Fix it in Ports & Protocols (change the port or disable that protocol), then Start again.")
+            state = .failed("port conflict")
+            return
+        }
+
         // Write the config file.
         let conf = ConfigWriter.config(for: server)
         do {
@@ -125,6 +135,23 @@ final class ServerController: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
             self?.start(server: server)
         }
+    }
+
+    /// Returns a human-readable description of the first unbindable port, or nil
+    /// if every planned listener looks bindable.
+    private func preflightPorts(_ p: ProtocolSettings) -> String? {
+        var lines: [String] = []
+        for l in p.plannedListeners {
+            switch PortChecker.check(port: l.port, udp: l.udp, host: p.listenIP) {
+            case .available, .unknown:
+                continue
+            case .inUse:
+                lines.append("  • port \(l.port) (\(l.label)) is already in use by another process")
+            case .needsPrivilege:
+                lines.append("  • port \(l.port) (\(l.label)) needs administrator privileges — ports below 1024 require root; use a higher port (e.g. \(l.port + 3000))")
+            }
+        }
+        return lines.isEmpty ? nil : lines.joined(separator: "\n")
     }
 
     // MARK: - Internals

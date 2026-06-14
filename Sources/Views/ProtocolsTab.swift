@@ -69,7 +69,7 @@ struct ProtocolsTab: View {
                 if server.protocols.smbEnabled {
                     Toggle("Allow writes over SMB", isOn: $server.protocols.smbWritable)
                     portField("SMB port", $server.protocols.smbPort)
-                    Label("SMB in copyparty is experimental and insecure. Port 445 needs root; pick a high port otherwise.",
+                    Label("SMB in copyparty is experimental and insecure. macOS already uses the standard port 445 (and binding it needs root), so this defaults to 3945 — connect with smb://host:3945.",
                           systemImage: "exclamationmark.triangle")
                         .font(.caption).foregroundStyle(.orange)
                 }
