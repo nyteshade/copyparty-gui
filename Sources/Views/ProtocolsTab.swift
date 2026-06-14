@@ -82,6 +82,7 @@ struct ProtocolsTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 
     @ViewBuilder

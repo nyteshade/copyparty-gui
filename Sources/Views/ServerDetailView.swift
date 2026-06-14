@@ -4,7 +4,10 @@ import AppKit
 struct ServerDetailView: View {
     @EnvironmentObject var store: ServerStore
     let serverID: UUID
+    var onToggleSidebar: () -> Void = {}
     @State private var tab: Tab = .volumes
+    @State private var editingName = false
+    @FocusState private var nameFocused: Bool
 
     enum Tab: String, CaseIterable, Identifiable {
         case volumes = "Volumes"
@@ -31,28 +34,114 @@ struct ServerDetailView: View {
 
             VStack(spacing: 0) {
                 header(server: server, controller: controller)
-                Divider()
-                TabView(selection: $tab) {
-                    VolumesTab(server: server).tabItem { Label(Tab.volumes.rawValue, systemImage: Tab.volumes.icon) }.tag(Tab.volumes)
-                    ProtocolsTab(server: server).tabItem { Label(Tab.protocols.rawValue, systemImage: Tab.protocols.icon) }.tag(Tab.protocols)
-                    UsersTab(server: server).tabItem { Label(Tab.users.rawValue, systemImage: Tab.users.icon) }.tag(Tab.users)
-                    AdvancedTab(server: server).tabItem { Label(Tab.advanced.rawValue, systemImage: Tab.advanced.icon) }.tag(Tab.advanced)
-                    LogTab(controller: controller).tabItem { Label(Tab.log.rawValue, systemImage: Tab.log.icon) }.tag(Tab.log)
-                }
-                .padding()
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 10)
+
+                Divider().opacity(0.3)
+
+                tabBar()
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+
+                Divider().opacity(0.25)
+
+                tabContent(server: server, controller: controller)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
+            .background(
+                ZStack {
+                    Theme.detailBG
+                    CassetteWatermark()
+                }
+                .ignoresSafeArea()
+            )
         } else {
             Text("Server not found.")
+        }
+    }
+
+    /// Custom segmented control — full-contrast labels (the system picker's
+    /// unselected text was too light on the dark chrome).
+    @ViewBuilder
+    private func tabBar() -> some View {
+        HStack(spacing: 3) {
+            ForEach(Tab.allCases) { t in
+                tabSegment(t)
+            }
+        }
+        .padding(3)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.quaternary.opacity(0.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.quaternary, lineWidth: 0.5))
+        )
+    }
+
+    @ViewBuilder
+    private func tabSegment(_ t: Tab) -> some View {
+        let selected = tab == t
+        let fill: Color = selected ? Theme.selectionFill : .clear
+        Text(t.rawValue)
+            .font(.callout.weight(selected ? .semibold : .medium))
+            .foregroundStyle(selected ? Color.white : Color.primary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.82)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 5)
+            .background(RoundedRectangle(cornerRadius: 7).fill(fill))
+            .contentShape(Rectangle())
+            .onTapGesture { withAnimation(.easeOut(duration: 0.12)) { tab = t } }
+    }
+
+    @ViewBuilder
+    private func tabContent(server: Binding<ServerInstance>, controller: ServerController) -> some View {
+        switch tab {
+        case .volumes:   VolumesTab(server: server).padding(20)
+        case .protocols: ProtocolsTab(server: server)
+        case .users:     UsersTab(server: server).padding(20)
+        case .advanced:  AdvancedTab(server: server)
+        case .log:       LogTab(controller: controller).padding(20)
         }
     }
 
     @ViewBuilder
     private func header(server: Binding<ServerInstance>, controller: ServerController) -> some View {
         HStack(spacing: 12) {
-            TextField("Server name", text: server.name)
-                .textFieldStyle(.plain)
-                .font(.title2.weight(.semibold))
-                .frame(maxWidth: 320)
+            Button(action: onToggleSidebar) {
+                Image(systemName: "sidebar.left")
+                    .font(.title3)
+                    .foregroundStyle(.primary)
+            }
+            .buttonStyle(.borderless)
+            .help("Toggle Sidebar")
+
+            // Name is a label by default; double-click (or the pencil) to rename,
+            // so a stray click/keystroke when the window gains focus can't change it.
+            if editingName {
+                TextField("Server name", text: server.name)
+                    .textFieldStyle(.plain)
+                    .font(.title2.weight(.semibold))
+                    .frame(maxWidth: 320)
+                    .focused($nameFocused)
+                    .onSubmit { editingName = false }
+                    .onChange(of: nameFocused) { _, focused in if !focused { editingName = false } }
+                    .task { nameFocused = true }
+            } else {
+                HStack(spacing: 6) {
+                    Text(server.wrappedValue.name.isEmpty ? "Untitled Server" : server.wrappedValue.name)
+                        .font(.title2.weight(.semibold))
+                        .lineLimit(1)
+                    Button { editingName = true } label: {
+                        Image(systemName: "pencil").font(.callout)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Rename server")
+                }
+                .contentShape(Rectangle())
+                .onTapGesture(count: 2) { editingName = true }
+                .help("Double-click to rename")
+            }
 
             StatusDot(state: controller.state)
             statusText(controller.state)
@@ -85,7 +174,7 @@ struct ServerDetailView: View {
                     Label("Start", systemImage: "play.fill")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(CassetteButtonStyle())
             }
         }
         .padding(.horizontal)

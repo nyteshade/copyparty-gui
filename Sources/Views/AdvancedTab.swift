@@ -63,6 +63,7 @@ struct AdvancedTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
         .task { if !updates.didInitialRefresh { await updates.refreshCurrentVersion() } }
     }
 

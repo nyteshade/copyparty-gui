@@ -35,6 +35,8 @@ struct CopyPartyApp: App {
                 .environmentObject(store)
                 .environmentObject(updates)
                 .frame(minWidth: 880, minHeight: 560)
+                .tint(Theme.accent)
+                .background(WindowTinter())
                 .task { await updates.checkForUpdates() }
                 .onDisappear { store.stopAll() }
         }

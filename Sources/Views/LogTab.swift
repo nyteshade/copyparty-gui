@@ -6,14 +6,18 @@ struct LogTab: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(spacing: 8) {
                 StatusDot(state: controller.state)
-                Text(stateLabel).font(.callout).foregroundStyle(.secondary)
+                Text(stateLabel)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
                 Spacer()
-                Button { copyLog() } label: { Label("Copy", systemImage: "doc.on.doc") }
-                    .buttonStyle(.borderless)
+                Button { copyLog() } label: {
+                    Label("Copy", systemImage: "doc.on.doc").font(.callout)
+                }
+                .buttonStyle(.borderless)
             }
-            .padding(.bottom, 6)
+            .padding(.bottom, 8)
 
             ScrollViewReader { proxy in
                 ScrollView {

@@ -4,11 +4,17 @@ struct ServerSidebar: View {
     @EnvironmentObject var store: ServerStore
 
     var body: some View {
-        List(selection: $store.selection) {
-            Section("Servers") {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 4) {
+                Text("SERVERS")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.sidebarInkSecondary)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 6)
+                    .padding(.bottom, 2)
+
                 ForEach(store.servers) { server in
                     SidebarRow(serverID: server.id)
-                        .tag(server.id)
                         .contextMenu {
                             Button("Duplicate") { store.duplicate(server.id) }
                             Button("Export…") { store.exportWithPanel(serverIDs: [server.id]) }
@@ -17,35 +23,40 @@ struct ServerSidebar: View {
                         }
                 }
             }
+            .padding(8)
         }
-        .listStyle(.sidebar)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 0) {
-                Divider()
+                Rectangle().fill(Theme.sidebarLine).frame(height: 1)
                 HStack {
                     EngineStatusView()
                     Spacer()
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                Divider()
+                Rectangle().fill(Theme.sidebarLine).frame(height: 1)
                 HStack {
                     Button { store.addServer() } label: {
                         Label("Add Server", systemImage: "plus")
+                            .fontWeight(.medium)
+                            .foregroundStyle(Theme.sidebarInk)
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(.plain)
                     Spacer()
                     if let id = store.selection {
-                        Button(role: .destructive) { store.delete(id) } label: {
-                            Image(systemName: "trash")
+                        Button { store.delete(id) } label: {
+                            Image(systemName: "trash").foregroundStyle(Theme.sidebarInk)
                         }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(.plain)
                     }
                 }
-                .padding(8)
+                .padding(10)
             }
-            .background(.bar)
+            .background(Theme.sidebarBottom)
         }
+        // Full-bleed glossy yellow behind everything (incl. under the titlebar
+        // and to all edges) so the dark window background doesn't bleed through.
+        .background(GlossySidebar().ignoresSafeArea())
     }
 }
 
@@ -56,32 +67,40 @@ private struct SidebarRow: View {
     var body: some View {
         let server = store.server(id: serverID)
         let controller = store.controller(for: serverID)
+        let selected = store.selection == serverID
+        let primary = selected ? Color.white : Theme.sidebarInk
+        let secondary = selected ? Color.white.opacity(0.88) : Theme.sidebarInkSecondary
+
         HStack(spacing: 8) {
             StatusDot(state: controller.state)
             VStack(alignment: .leading, spacing: 1) {
                 Text(server?.name ?? "—")
+                    .fontWeight(.semibold)
+                    .foregroundStyle(primary)
                     .lineLimit(1)
                 Text(subtitle(server))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(secondary)
                     .lineLimit(1)
             }
-            Spacer()
-            if controller.isRunning {
-                Button { store.stop(serverID) } label: {
-                    Image(systemName: "stop.fill")
-                }
-                .buttonStyle(.borderless)
-                .help("Stop")
-            } else {
-                Button { store.requestStart(serverID) } label: {
-                    Image(systemName: "play.fill")
-                }
-                .buttonStyle(.borderless)
-                .help("Start")
+            Spacer(minLength: 4)
+            Button {
+                controller.isRunning ? store.stop(serverID) : store.requestStart(serverID)
+            } label: {
+                Image(systemName: controller.isRunning ? "stop.fill" : "play.fill")
+                    .foregroundStyle(primary)
             }
+            .buttonStyle(.plain)
+            .help(controller.isRunning ? "Stop" : "Start")
         }
-        .padding(.vertical, 2)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(selected ? Theme.selectionFill : Color.clear)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture { store.selection = serverID }
     }
 
     private func subtitle(_ server: ServerInstance?) -> String {
@@ -105,7 +124,7 @@ struct StatusDot: View {
         case .running: return .green
         case .starting: return .yellow
         case .failed: return .red
-        case .stopped: return .secondary
+        case .stopped: return Color(hex: 0x8A8A8A)  // visible on both yellow and dark
         }
     }
     private var text: String {

@@ -12,7 +12,7 @@ struct EngineStatusView: View {
                 statusIcon.frame(width: 13, height: 13)
                 Text(versionLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.sidebarInkSecondary)
                     .lineLimit(1)
             }
             .contentShape(Rectangle())
@@ -53,16 +53,26 @@ struct EngineStatusView: View {
         case .checking, .downloading:
             ProgressView().controlSize(.small).scaleEffect(0.55)
         case .upToDate:
-            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+            badge("checkmark.circle.fill", fill: Color(hex: 0x1B7A37))
         case .updateAvailable:
-            Image(systemName: "arrow.down.circle.fill").foregroundStyle(.blue).symbolEffect(.pulse)
+            badge("arrow.down.circle.fill", fill: Color(hex: 0x1F5FD0)).symbolEffect(.pulse)
         case .installed:
-            Image(systemName: "checkmark.seal.fill").foregroundStyle(.green)
+            badge("checkmark.seal.fill", fill: Color(hex: 0x1B7A37))
         case .error:
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+            badge("exclamationmark.triangle.fill", fill: Color(hex: 0xC2410C))
         case .idle:
-            Image(systemName: "shippingbox.fill").foregroundStyle(.secondary)
+            Image(systemName: "shippingbox.fill")
+                .foregroundStyle(Theme.sidebarInkSecondary)
         }
+    }
+
+    /// A status glyph with a white symbol on a darker, saturated fill plus a soft
+    /// dark edge — so it pops against the bright yellow sidebar.
+    private func badge(_ name: String, fill: Color) -> some View {
+        Image(systemName: name)
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(.white, fill)
+            .shadow(color: .black.opacity(0.4), radius: 0.5, y: 0.5)
     }
 
     // MARK: - Popover
