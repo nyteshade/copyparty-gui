@@ -23,4 +23,10 @@ rsync -a --delete "$VENDOR/python/" "$DEST/python/"
 rsync -a "$VENDOR/copyparty/copyparty-sfx.py" "$DEST/copyparty/copyparty-sfx.py"
 [[ -f "$VENDOR/manifest.json" ]] && rsync -a "$VENDOR/manifest.json" "$DEST/manifest.json"
 
+# Ship the raw, unmasked .icns so the app can override the Dock icon at launch
+# (defeating the macOS 26 squircle mask — see DockIcon.swift).
+if [[ -f "$SRCROOT/Resources/Icon/A-Side.icns" ]]; then
+  rsync -a "$SRCROOT/Resources/Icon/A-Side.icns" "$DEST/A-Side.icns"
+fi
+
 echo "note: embed-vendor complete"

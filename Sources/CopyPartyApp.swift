@@ -1,7 +1,16 @@
 import SwiftUI
+import AppKit
+
+/// App delegate used only to override the Dock icon at launch (see DockIcon).
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        DockIcon.applyUnmaskedIcon()
+    }
+}
 
 @main
 struct CopyPartyApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = ServerStore()
     @StateObject private var updates = UpdateService()
 

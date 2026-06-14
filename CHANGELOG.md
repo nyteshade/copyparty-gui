@@ -4,6 +4,20 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-06-14
+
+### Added
+
+- **Unmasked Dock icon** — on launch the app sets its Dock icon programmatically
+  from the raw `A-Side.icns`, bypassing the macOS 26 ("Tahoe") squircle mask so
+  the full-bleed cassette artwork renders correctly. Older macOS keeps using the
+  bundle's app icon unchanged.
+
+### Changed
+
+- README expanded to complete coverage of features, protocols, configuration,
+  building, and troubleshooting.
+
 ## [1.0.0] — 2026-06-14
 
 First release. A native macOS GUI for the
@@ -50,4 +64,5 @@ self-contained, batteries-included Python runtime.
   [barkerbaggies](https://www.deviantart.com/barkerbaggies), licensed under
   [CC BY-NC-SA 3.0 Unported](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
-[1.0.0]: https://github.com/9001/copyparty
+[1.1.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.1.0
+[1.0.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.0.0
