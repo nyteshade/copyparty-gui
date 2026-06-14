@@ -1,0 +1,11 @@
+# Vendored binaries (large; reproduced by scripts/fetch-vendor.sh)
+/Vendor/*
+!/Vendor/manifest.json
+
+# Xcode / build
+*.xcodeproj
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store

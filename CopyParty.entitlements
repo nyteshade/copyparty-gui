@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Non-sandboxed: the app spawns a bundled Python process that binds
+	     arbitrary network ports and reads user-selected directories.
+	     App Sandbox would block both. -->
+	<key>com.apple.security.app-sandbox</key>
+	<false/>
+	<!-- Allow loading the bundled Python's dylibs even under any future
+	     hardened-runtime configuration. -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
+	<key>com.apple.security.cs.allow-dyld-environment-variables</key>
+	<true/>
+	<key>com.apple.security.network.server</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+</dict>
+</plist>

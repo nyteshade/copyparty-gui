@@ -1,0 +1,13 @@
+{
+  "python": {
+    "version": "3.12.13",
+    "arch": "aarch64-apple-darwin",
+    "flavor": "install_only",
+    "asset_url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.12.13%2B20260610-aarch64-apple-darwin-install_only.tar.gz"
+  },
+  "copyparty": {
+    "tag": "v1.20.16",
+    "version_line": "",
+    "sfx_url": "https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py"
+  }
+}
