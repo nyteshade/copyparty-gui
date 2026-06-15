@@ -7,22 +7,12 @@ struct ServerSidebar: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("SERVERS")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Theme.sidebarInkSecondary)
-                    Spacer()
-                    Button(action: onToggleSidebar) {
-                        Image(systemName: "sidebar.left")
-                            .font(.callout)
-                            .foregroundStyle(Theme.sidebarInk)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Collapse Sidebar")
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 6)
-                .padding(.bottom, 2)
+                Text("SERVERS")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.sidebarInkSecondary)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 6)
+                    .padding(.bottom, 2)
 
                 ForEach(store.servers) { server in
                     SidebarRow(serverID: server.id)
@@ -68,6 +58,20 @@ struct ServerSidebar: View {
         // Full-bleed glossy yellow behind everything (incl. under the titlebar
         // and to all edges) so the dark window background doesn't bleed through.
         .background(GlossySidebar().ignoresSafeArea())
+        // Collapse control pinned to the top-right, up in the titlebar band
+        // (we ignore the safe area), larger and dark for contrast on yellow.
+        .overlay(alignment: .topTrailing) {
+            Button(action: onToggleSidebar) {
+                Image(systemName: "sidebar.left")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Theme.sidebarInk)
+            }
+            .buttonStyle(.plain)
+            .help("Collapse Sidebar")
+            .padding(.trailing, 16)
+            .padding(.top, 14)
+            .offset(y: -38)
+        }
     }
 }
 

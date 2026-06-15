@@ -124,6 +124,7 @@ struct CassetteButtonStyle: ButtonStyle {
 // MARK: - Subtle oversized cassette bleeding off the SE corner of the detail
 
 struct CassetteWatermark: View {
+    @Environment(\.colorScheme) private var scheme
     var body: some View {
         GeometryReader { geo in
             Image("Cassette")
@@ -131,7 +132,7 @@ struct CassetteWatermark: View {
                 .scaledToFit()
                 .frame(width: max(geo.size.width, geo.size.height) * 0.9)
                 .rotationEffect(.degrees(-10))
-                .opacity(0.06)
+                .opacity(scheme == .light ? 0.16 : 0.06)
                 .offset(x: geo.size.width * 0.32, y: geo.size.height * 0.36)
                 .frame(width: geo.size.width, height: geo.size.height, alignment: .bottomTrailing)
         }
