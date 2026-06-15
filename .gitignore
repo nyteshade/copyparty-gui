@@ -2,6 +2,9 @@
 /Vendor/*
 !/Vendor/manifest.json
 
+# Marketing copy — kept local, not part of the source release
+/docs/linkedin-post.md
+
 # Xcode / build
 *.xcodeproj
 build/

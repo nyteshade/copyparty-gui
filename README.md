@@ -27,6 +27,7 @@ both light and dark mode.
 - [Architecture](#architecture)
 - [Building from source](#building-from-source)
 - [How the embedded runtime is assembled](#how-the-embedded-runtime-is-assembled)
+- [Building a notarized release](#building-a-notarized-release)
 - [Troubleshooting & caveats](#troubleshooting--caveats)
 - [Versioning](#versioning)
 - [Credits & licensing](#credits--licensing)
@@ -193,6 +194,72 @@ xcodebuild -project CopyParty.xcodeproj -scheme CopyParty -configuration Debug b
 - The app is **non-sandboxed** (`CopyParty.entitlements`) and ad-hoc signed for
   local development; hardened runtime is off.
 
+## Building a notarized release
+
+`scripts/build-release.sh` produces a **Developer ID-signed, hardened-runtime,
+notarized, stapled** app packaged as both a `.dmg` and a `.zip`. Day-to-day dev
+builds stay ad-hoc — release signing lives entirely in this script, so the normal
+`xcodegen`/`xcodebuild` loop is unaffected.
+
+Because the app embeds a full CPython runtime (~85 `.dylib`/`.so` files plus the
+native `python3.12`), the script signs **every** Mach-O inside-out with the
+hardened runtime before sealing the bundle, then submits it to Apple and staples
+the ticket. The embedded interpreter is signed with `CopyParty.entitlements`
+(`disable-library-validation` + `allow-dyld-environment-variables`) so it can load
+the bundled extensions under the hardened runtime.
+
+```sh
+# One-time: store App Store Connect API key credentials in the keychain
+# (the key needs only the "Developer" role)
+xcrun notarytool store-credentials "CopyParty-Notary" \
+  --key    /path/to/AuthKey_XXXXXXXXXX.p8 \
+  --key-id XXXXXXXXXX \
+  --issuer xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+# Single notarized build of the current Vendor/ runtime (dmg + zip)
+scripts/build-release.sh
+
+# Signing-only dry run (no credentials needed) — verify signing locally
+NOTARIZE=0 scripts/build-release.sh
+```
+
+`build-release.sh` is parameterized via env: `ARCHS` (`"arm64"` or `"arm64 x86_64"`),
+`SIGN_MODE` (`developer-id`|`adhoc`), `NOTARIZE`, `LABEL`, `MAKE_DMG`, `MAKE_ZIP`,
+plus `CODESIGN_IDENTITY`/`TEAM_ID`/`NOTARY_PROFILE`. The embedded runtime arch must
+match `ARCHS` — see the vendor scripts below.
+
+### Universal (Intel + Apple Silicon) runtime
+
+python-build-standalone ships per-arch (no universal2), so a universal app is
+assembled by fetching both and `lipo`-merging every Mach-O:
+
+```sh
+VENDOR_ARCH=universal scripts/fetch-vendor.sh   # fat arm64+x86_64 Vendor/python
+scripts/thin-vendor.sh arm64                    # thin a universal tree back to one arch
+```
+
+x86_64 dependencies are pip-installed under Rosetta; `cryptography` is capped at
+`<49` because newer releases dropped their Intel-macOS wheel.
+
+### One-command release (all flavors → GitHub)
+
+`scripts/release-github.sh` builds three flavors and publishes a GitHub release:
+
+| Flavor | Arch | Signing | Files |
+|--------|------|---------|-------|
+| **universal** | arm64 + x86_64 | Developer ID + notarized | `.dmg`, `.zip` |
+| **arm64** | Apple Silicon | Developer ID + notarized | `.dmg`, `.zip` |
+| **adhoc** | arm64 + x86_64 | ad-hoc, **not** notarized | `.zip` |
+
+```sh
+scripts/release-github.sh             # dry run — builds everything, prints the gh command
+PUBLISH=1 scripts/release-github.sh   # also creates the GitHub release for the current tag
+```
+
+Artifacts land in `build-release/release-<version>/`. The ad-hoc build is for
+self-builders / offline use; after download, clear quarantine to launch it:
+`xattr -dr com.apple.quarantine CopyParty.app`.
+
 ## Troubleshooting & caveats
 
 - **Privileged ports.** TFTP port 69 and SMB port 445 require running as root.
@@ -201,9 +268,10 @@ xcodebuild -project CopyParty.xcodeproj -scheme CopyParty -configuration Debug b
 - **Video thumbnails / transcoding** additionally need an `ffmpeg` binary, which
   is not bundled. Image thumbnails (Pillow) and audio tags (mutagen) work out of
   the box.
-- **Distribution.** This dev build is non-sandboxed + ad-hoc signed. Shipping
-  outside your Mac would need hardened runtime, a Developer ID signature, and
-  notarization (and note the icon's NonCommercial license).
+- **Distribution.** Dev builds are non-sandboxed + ad-hoc signed. For shipping
+  outside your Mac, use `scripts/build-release.sh` (hardened runtime + Developer ID
+  + notarization); see [Building a notarized release](#building-a-notarized-release)
+  (and note the icon's NonCommercial license).
 - **First SFTP start** generates host keys under
   `~/Library/Preferences/copyparty/` — expect a short delay.
 

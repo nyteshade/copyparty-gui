@@ -4,6 +4,33 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] — 2026-06-14
+
+First properly distributable release — signed, notarized, and shipped in three
+flavors so it runs cleanly on any Mac.
+
+### Added
+
+- **Notarized distributables** — `scripts/build-release.sh` builds a Developer ID
+  signed, hardened-runtime app, deep-signs every embedded Mach-O (the bundled
+  CPython runtime + native extensions) inside-out, submits it to Apple's notary
+  service, staples the ticket, and packages a `.dmg` and `.zip`.
+- **Universal (Intel + Apple Silicon) builds** — `scripts/fetch-vendor.sh` can now
+  assemble a universal `Vendor/python` by fetching both architectures of
+  python-build-standalone and `lipo`-merging every Mach-O; `scripts/thin-vendor.sh`
+  thins a universal runtime back to a single arch.
+- **One-command release** — `scripts/release-github.sh` produces three flavors and
+  publishes a GitHub release with notes:
+  - **universal** (notarized) — runs on any Mac, zero Gatekeeper friction;
+  - **arm64** (notarized) — Apple Silicon only, smaller download;
+  - **adhoc** (ad-hoc signed, not notarized) — for self-builders / offline use,
+    runs after clearing quarantine.
+
+### Changed
+
+- No functional changes to the app itself versus 1.5.0; this release is about
+  signing, notarization, and distribution.
+
 ## [1.5.0] — 2026-06-14
 
 A full visual + interaction pass.
