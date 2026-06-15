@@ -54,7 +54,7 @@ enum Theme {
     /// the window is focused, with white text on top.
     static let selectionFill = Color(hex: 0x2F58C0)
 
-    // Neutral, faintly-cool chrome for the rest of the window
+    // Neutral, faintly-cool chrome for the detail pane.
     static let detailBG = Color(lightHex: 0xEEF0F4, darkHex: 0x1E2023)
     static let windowBG = detailBG
 
@@ -158,7 +158,6 @@ struct WindowTinter: NSViewRepresentable {
             window.titlebarAppearsTransparent = true
             // Let content (the sidebar's yellow) paint under the titlebar so the
             // sidebar runs full-height with the traffic lights sitting on yellow.
-            window.styleMask.insert(.fullSizeContentView)
             window.initialFirstResponder = nil
             window.makeFirstResponder(nil)
             context.coordinator.observe(window)

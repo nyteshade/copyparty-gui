@@ -2,22 +2,16 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: ServerStore
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
-
-    private func toggleSidebar() {
-        withAnimation(.easeInOut(duration: 0.2)) {
-            columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
-        }
-    }
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
+        // Keep the native sidebar toggle — removing it flips macOS 26's sidebar
+        // to an inset floating panel and the full-height yellow bleed is lost.
+        NavigationSplitView {
             ServerSidebar()
                 .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 340)
-                .toolbar(removing: .sidebarToggle)
         } detail: {
             if let id = store.selection, store.server(id: id) != nil {
-                ServerDetailView(serverID: id, onToggleSidebar: toggleSidebar)
+                ServerDetailView(serverID: id)
                     .id(id)
             } else {
                 ContentUnavailableView(
