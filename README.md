@@ -5,7 +5,14 @@ file server. It bundles its **own self-contained, batteries-included Python
 runtime** and `copyparty-sfx.py`, so there is nothing to install — launch the
 app, point it at a folder, and press **Start**.
 
-![cassette icon](Resources/Assets.xcassets/AppIcon.appiconset/icon_256.png)
+<p align="center">
+  <img src="docs/light_mode.png" width="49%" alt="CopyParty.app in light mode">
+  <img src="docs/dark_mode.png" width="49%" alt="CopyParty.app in dark mode">
+</p>
+
+A glossy 80s-cassette-yellow sidebar (derived from the app icon), a neutral
+detail pane, and contrast tuned with APCA-style polarity so text stays crisp in
+both light and dark mode.
 
 ---
 
@@ -51,6 +58,11 @@ app, point it at a folder, and press **Start**.
 - **Unmasked Dock icon** — defeats the macOS 26 squircle mask so the full-bleed
   cassette artwork renders correctly (see
   [`DockIcon.swift`](Sources/Services/DockIcon.swift)).
+- **Themed, contrast-correct UI** — a glossy full-height cassette-yellow sidebar,
+  neutral detail pane, cobalt accents, a translucent cassette watermark, and
+  text contrast tuned with APCA-style polarity for both appearances. Editing the
+  server name requires an explicit action (double-click / pencil) so a stray
+  keystroke can't rename it.
 
 ## Concepts
 

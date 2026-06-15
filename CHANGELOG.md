@@ -4,6 +4,38 @@ All notable changes to CopyParty.app are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] — 2026-06-14
+
+A full visual + interaction pass.
+
+### Added
+
+- **Themed UI** — a glossy, full-height 80s-cassette-yellow sidebar (color and
+  artwork derived from the app icon) with a left→right "lit plastic" gradient,
+  a neutral light/dark detail pane, cobalt accents, and a translucent oversized
+  cassette watermark bleeding off the southeast corner (more solid in light
+  mode).
+- **APCA-style contrast** — text/background pairs are tuned for real lightness
+  contrast (light surface → dark ink, dark surface → light ink), so labels stay
+  crisp in both appearances instead of relying on WCAG-passing midtone grays.
+- **Custom segmented control** for the detail tabs (crisper labels and standard
+  spacing than the system picker).
+- **Access permission chips** with obvious active/inactive states and an instant
+  on-hover label (e.g. `R — Read`) so meaning shows without waiting for a tooltip.
+- **Custom sidebar collapse control** that lives in the sidebar when open and
+  moves to the detail header when collapsed.
+
+### Fixed
+
+- **No more accidental renames / keystroke theft** — the window no longer
+  auto-focuses a text field when it becomes key. The server name is a label;
+  rename via double-click or the pencil.
+- **Full-height sidebar restored on macOS 26** — keep the native sidebar toggle
+  (removing it flips the sidebar to an inset floating panel) and hide its button
+  view in AppKit instead, so the yellow runs full-height under the titlebar.
+- **Status badge & engine pill contrast** on the yellow sidebar; unified Log
+  header font sizes; off-main-thread version probe (no UI hitch).
+
 ## [1.4.0] — 2026-06-14
 
 ### Added
@@ -119,6 +151,7 @@ self-contained, batteries-included Python runtime.
   [barkerbaggies](https://www.deviantart.com/barkerbaggies), licensed under
   [CC BY-NC-SA 3.0 Unported](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
+[1.5.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.5.0
 [1.4.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.4.0
 [1.3.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.3.0
 [1.2.0]: https://github.com/nyteshade/copyparty-gui/releases/tag/v1.2.0
