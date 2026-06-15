@@ -2,16 +2,27 @@ import SwiftUI
 
 struct ServerSidebar: View {
     @EnvironmentObject var store: ServerStore
+    var onToggleSidebar: () -> Void = {}
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 4) {
-                Text("SERVERS")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Theme.sidebarInkSecondary)
-                    .padding(.horizontal, 12)
-                    .padding(.top, 6)
-                    .padding(.bottom, 2)
+                HStack {
+                    Text("SERVERS")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Theme.sidebarInkSecondary)
+                    Spacer()
+                    Button(action: onToggleSidebar) {
+                        Image(systemName: "sidebar.left")
+                            .font(.callout)
+                            .foregroundStyle(Theme.sidebarInk)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Collapse Sidebar")
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 6)
+                .padding(.bottom, 2)
 
                 ForEach(store.servers) { server in
                     SidebarRow(serverID: server.id)

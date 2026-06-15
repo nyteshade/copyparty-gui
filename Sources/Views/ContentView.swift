@@ -17,12 +17,16 @@ struct ContentView: View {
         // toggle's view at the AppKit level (HideNativeSidebarToggle) and drive
         // the same action from our own control in the detail header.
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            ServerSidebar()
+            ServerSidebar(onToggleSidebar: toggleSidebar)
                 .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 340)
                 .background(HideNativeSidebarToggle())
         } detail: {
             if let id = store.selection, store.server(id: id) != nil {
-                ServerDetailView(serverID: id, onToggleSidebar: toggleSidebar)
+                // The toggle lives in the sidebar while it's open; it appears in
+                // the detail header only when the sidebar is collapsed.
+                ServerDetailView(serverID: id,
+                                 onToggleSidebar: toggleSidebar,
+                                 showSidebarToggle: columnVisibility == .detailOnly)
                     .id(id)
             } else {
                 ContentUnavailableView(

@@ -5,6 +5,7 @@ struct ServerDetailView: View {
     @EnvironmentObject var store: ServerStore
     let serverID: UUID
     var onToggleSidebar: () -> Void = {}
+    var showSidebarToggle: Bool = false
     @State private var tab: Tab = .volumes
     @State private var editingName = false
     @FocusState private var nameFocused: Bool
@@ -108,13 +109,15 @@ struct ServerDetailView: View {
     @ViewBuilder
     private func header(server: Binding<ServerInstance>, controller: ServerController) -> some View {
         HStack(spacing: 12) {
-            Button(action: onToggleSidebar) {
-                Image(systemName: "sidebar.left")
-                    .font(.title3)
-                    .foregroundStyle(.primary)
+            if showSidebarToggle {
+                Button(action: onToggleSidebar) {
+                    Image(systemName: "sidebar.left")
+                        .font(.title3)
+                        .foregroundStyle(.primary)
+                }
+                .buttonStyle(.borderless)
+                .help("Show Sidebar")
             }
-            .buttonStyle(.borderless)
-            .help("Toggle Sidebar")
 
             // Name is a label by default; double-click (or the pencil) to rename,
             // so a stray click/keystroke when the window gains focus can't change it.
