@@ -58,19 +58,20 @@ struct ServerSidebar: View {
         // Full-bleed glossy yellow behind everything (incl. under the titlebar
         // and to all edges) so the dark window background doesn't bleed through.
         .background(GlossySidebar().ignoresSafeArea())
-        // Collapse control pinned to the top-right, up in the titlebar band
-        // (we ignore the safe area), larger and dark for contrast on yellow.
+        // Collapse control at the top-right, just below the titlebar drag band
+        // (that band is an AppKit layer that eats clicks, so we can't sit a
+        // working control inside it). Dark for contrast on the yellow.
         .overlay(alignment: .topTrailing) {
             Button(action: onToggleSidebar) {
                 Image(systemName: "sidebar.left")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(Theme.sidebarInk)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .help("Collapse Sidebar")
-            .padding(.trailing, 16)
-            .padding(.top, 14)
-            .offset(y: -38)
+            .padding(.trailing, 14)
+            .padding(.top, 6)
         }
     }
 }
