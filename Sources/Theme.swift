@@ -140,6 +140,31 @@ struct CassetteWatermark: View {
     }
 }
 
+// MARK: - Hide the native sidebar toggle (keeps the full-height bleed)
+//
+// Removing the toggle via SwiftUI's `.toolbar(removing: .sidebarToggle)` flips
+// the macOS 26 sidebar into an inset floating panel and loses the yellow bleed
+// under the titlebar. So instead we leave it in place structurally and just hide
+// its button view in AppKit. A custom control drives the same action.
+
+struct HideNativeSidebarToggle: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { Self.hide(in: view.window) }
+        return view
+    }
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async { Self.hide(in: nsView.window) }
+    }
+
+    private static func hide(in window: NSWindow?) {
+        guard let toolbar = window?.toolbar else { return }
+        for item in toolbar.items where item.itemIdentifier.rawValue.contains("toggleSidebar") {
+            item.view?.isHidden = true
+        }
+    }
+}
+
 // MARK: - Host-window setup: neutral chrome + no auto-focus of text fields
 //
 // AppKit makes the first text field the first responder whenever the window
