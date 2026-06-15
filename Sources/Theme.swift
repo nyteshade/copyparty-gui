@@ -37,7 +37,8 @@ extension NSColor {
 // contrast. Accents are the icon's cobalt blue.
 
 enum Theme {
-    // Cassette yellow — sidebar only
+    // Cassette yellow
+    static let yellow = Color(hex: 0xF7CE46)        // brand primary (labels/highlights)
     static let sidebarTop = Color(hex: 0xF8D24E)
     static let sidebarBottom = Color(hex: 0xEFBE2A)
     static var sidebar: LinearGradient {
@@ -68,8 +69,8 @@ enum Theme {
 struct GlossySidebar: View {
     var body: some View {
         ZStack {
-            // 1. Perceptible "lit plastic" body gradient — brighter at top,
-            //    deepening toward the bottom (subtle, not a button bevel).
+            // 1. Perceptible "lit plastic" body gradient — lighter on the left,
+            //    deepening to the right (lit from the left, not a button bevel).
             LinearGradient(
                 stops: [
                     .init(color: Color(hex: 0xFBDA5E), location: 0.00),
@@ -77,24 +78,17 @@ struct GlossySidebar: View {
                     .init(color: Color(hex: 0xEEBE2E), location: 0.72),
                     .init(color: Color(hex: 0xE3AC1B), location: 1.00),
                 ],
-                startPoint: .top, endPoint: .bottom)
+                startPoint: .leading, endPoint: .trailing)
 
-            // 2. Broad soft specular sheen over the top — the gloss reflection.
+            // 2. Soft specular sheen down the lit (left) edge — the gloss.
             LinearGradient(
-                colors: [.white.opacity(0.50), .white.opacity(0.10), .clear],
-                startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.5))
-                .blendMode(.softLight)
-
-            // 3. A soft reflection hotspot near the top, like light on plastic.
-            RadialGradient(
-                colors: [.white.opacity(0.30), .clear],
-                center: UnitPoint(x: 0.34, y: 0.10),
-                startRadius: 0, endRadius: 240)
+                colors: [.white.opacity(0.45), .white.opacity(0.08), .clear],
+                startPoint: .leading, endPoint: UnitPoint(x: 0.5, y: 0.5))
                 .blendMode(.softLight)
         }
-        .overlay(alignment: .top) {
-            // Crisp specular highlight line along the very top edge.
-            Rectangle().fill(.white.opacity(0.55)).frame(height: 1)
+        .overlay(alignment: .leading) {
+            // Crisp specular highlight line along the lit left edge.
+            Rectangle().fill(.white.opacity(0.45)).frame(width: 1)
         }
         .overlay(alignment: .trailing) {
             // A thin seam where the plastic meets the detail pane.
@@ -162,6 +156,9 @@ struct WindowTinter: NSViewRepresentable {
             guard let window = view.window else { return }
             window.backgroundColor = NSColor(Theme.windowBG)
             window.titlebarAppearsTransparent = true
+            // Let content (the sidebar's yellow) paint under the titlebar so the
+            // sidebar runs full-height with the traffic lights sitting on yellow.
+            window.styleMask.insert(.fullSizeContentView)
             window.initialFirstResponder = nil
             window.makeFirstResponder(nil)
             context.coordinator.observe(window)

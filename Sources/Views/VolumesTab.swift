@@ -123,38 +123,61 @@ private struct AccessRuleRow: View {
     @Binding var rule: AccessRule
     let accounts: [Account]
     let onDelete: () -> Void
+    @State private var hovered: Permission?
 
     var body: some View {
-        HStack(spacing: 8) {
-            // Permission toggles
-            HStack(spacing: 2) {
-                ForEach(Permission.allCases) { perm in
-                    Toggle(perm.rawValue.uppercased(), isOn: binding(for: perm))
-                        .toggleStyle(.button)
-                        .controlSize(.small)
-                        .help(perm.label)
+        VStack(alignment: .leading, spacing: 3) {
+            // Instant hover label (no tooltip delay) — primary yellow + shadow.
+            Text(hovered.map { "\($0.rawValue.uppercased())  —  \($0.label)" } ?? " ")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(Theme.yellow)
+                .shadow(color: .black.opacity(0.75), radius: 1, y: 0.5)
+                .frame(height: 13, alignment: .leading)
+                .animation(.easeOut(duration: 0.08), value: hovered)
+
+            HStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    ForEach(Permission.allCases) { perm in chip(perm) }
                 }
+                Image(systemName: "arrow.right").foregroundStyle(.secondary).font(.caption)
+                TextField("* or user1, user2", text: principalsBinding)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 200)
+                Spacer()
+                Button(role: .destructive, action: onDelete) {
+                    Image(systemName: "minus.circle")
+                }
+                .buttonStyle(.borderless)
             }
-            Text("→").foregroundStyle(.secondary)
-            TextField("* or user1, user2", text: principalsBinding)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 200)
-            Spacer()
-            Button(role: .destructive, action: onDelete) {
-                Image(systemName: "minus.circle")
-            }
-            .buttonStyle(.borderless)
         }
     }
 
-    private func binding(for perm: Permission) -> Binding<Bool> {
-        Binding(
-            get: { rule.permissions.contains(perm) },
-            set: { on in
-                if on { if !rule.permissions.contains(perm) { rule.permissions.append(perm) } }
-                else { rule.permissions.removeAll { $0 == perm } }
+    private func chip(_ perm: Permission) -> some View {
+        let on = rule.permissions.contains(perm)
+        return Text(perm.rawValue.uppercased())
+            .font(.system(size: 12, weight: .bold, design: .monospaced))
+            .frame(width: 26, height: 24)
+            .background(
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(on ? Theme.actionBlue : Color.secondary.opacity(0.12)))
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .strokeBorder(on ? .clear : Color.secondary.opacity(0.5), lineWidth: 1))
+            .foregroundStyle(on ? Color.white : Color.secondary)
+            .shadow(color: on ? Theme.actionBlue.opacity(0.45) : .clear, radius: 2, y: 1)
+            .contentShape(Rectangle())
+            .onTapGesture { toggle(perm) }
+            .onHover { inside in
+                if inside { hovered = perm } else if hovered == perm { hovered = nil }
             }
-        )
+    }
+
+    private func toggle(_ perm: Permission) {
+        if rule.permissions.contains(perm) {
+            rule.permissions.removeAll { $0 == perm }
+        } else {
+            rule.permissions.append(perm)
+        }
     }
 
     private var principalsBinding: Binding<String> {
